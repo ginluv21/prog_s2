@@ -1,6 +1,6 @@
 all: 
-	gcc main.c datatime.c bitstruct.c -o datetime_app
+	gcc main.c datatime.c bitstruct.c -o datatime_app.o
 clean:
-	rm -f datetime_app
+	rm -f datatime_app.o
 run:
-	./datetime_app
+	./datatime_app.o

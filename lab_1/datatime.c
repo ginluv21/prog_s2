@@ -433,13 +433,17 @@ unsigned long long datatime_diff_in_seconds_from_unix(const datatime *dt) {
     if (dt == NULL) {
         return 0;
     }
+     
+    datatime* temp = datatime_from_minutes(unix_dt_in_minutes);
 
-    if (datatime_compare(dt, datatime_from_minutes(unix_dt_in_minutes)) < 0) {
+    if (datatime_compare(dt, temp) < 0) {
         printf("Дата раньше Unix Epoch\n");
         return 0;
     }
 
     unsigned long long total_seconds = (datatime_to_minutes(dt) - unix_dt_in_minutes) * 60;
+
+    datatime_destroy(&temp);
     return total_seconds;
 } 
 

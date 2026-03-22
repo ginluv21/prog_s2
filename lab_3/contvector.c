@@ -1,5 +1,3 @@
-// https://open.spotify.com/album/5epJvt9jHbYI1j6WqCppGc?si=Ku7bcDeEStCHNp6WAwQ1gg
-// https://open.spotify.com/playlist/6f2WRnB0KEgqGKr53FuwOV?si=8m4RXWNqQd-2P1pu0bZXfA
 #include "contvector.h"
 
 vector_t * vec_create(size_t ini_cap){
@@ -167,4 +165,80 @@ int vec_change(vector_t *vec, size_t ind, datatime *dt){
     return 0;
 }
 
+vector_t *vec_copy(vector_t *vec){
+    if(vec == NULL) return NULL;
 
+    vector_t *temp = vec_create(vec->cap);
+    if(temp == NULL) return NULL;
+
+    for(int i = 0; i < vec->len; i++){
+        datatime *new_dt = calloc(1, sizeof(datatime));
+        if(new_dt == NULL) return NULL;
+
+        copy_datatime(new_dt, *(vec->data + i));
+        *(temp->data + i) = new_dt;
+        temp->len++;
+    }
+    return temp;
+}
+
+int vec_merge(vector_t *v1, vector_t *v2){
+    if(v1 == NULL || v2 == NULL) return 1;
+
+    size_t total_len = v1->len + v2->len;
+    if(total_len > v1->cap)
+        if(!vec_reserve(v1, total_len)) return 1;
+    
+    for(int i = 0; i < v2->len; i++){
+        datatime *new_dt = calloc(1, sizeof(datatime));
+
+        if(new_dt == NULL) return 1;
+        copy_datatime(new_dt, *(v2->data + i));
+        vec_push(v1, new_dt);
+    }
+
+    return 0;
+}
+
+
+vec_iter_t vec_begin(vector_t *vec){
+    vec_iter_t temp;
+    temp.vec = vec;
+    temp.ind = 0;
+    return temp;
+}
+
+vec_iter_t vec_end(vector_t *vec){
+    vec_iter_t temp;
+    temp.vec = vec;
+    temp.ind = (vec->len) ? vec->len - 1: 0;
+    return temp;
+}
+
+void vec_iter_next(vec_iter_t *iter){
+    if(iter->vec->len > iter->ind)
+        iter->ind++;
+}
+
+int vec_isequal(vec_iter_t it1, vec_iter_t it2){
+    if(it1.vec == it2.vec && it1.ind == it2.ind)
+        return 1;
+    return 0;
+}
+int vec_iter_belong(vec_iter_t it, vector_t *vec){
+    if(it.vec == vec)
+        return 1;
+    return 0;
+}
+
+void print_vector(vector_t *vec) {
+    printf("Вектор [len: %zu, cap: %zu]:\n", vec_len(vec), vec_cap(vec));
+    for (size_t i = 0; i < vec_len(vec); i++) {
+        datatime *dt = vec_get(vec, i);
+        if (dt) {
+            printf("  [%zu] -> ", i);
+            datatime_print(dt); // Твоя функция
+        }
+    }
+    printf("\n");
+}

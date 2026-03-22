@@ -79,7 +79,7 @@ void copy_datatime(datatime *a, const datatime *b){
 
 void datatime_print(const datatime *dt) {
     if (dt != NULL) {
-        printf("DateTime: %02d/%02d/%04d %02d:%02d\n",
+        printf("%02d/%02d/%04d %02d:%02d\n",
                 dt->day, dt->month, dt->year,
                 dt->hour, dt->minute);
     }

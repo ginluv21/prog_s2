@@ -11,6 +11,12 @@ vector_t * vec_create(size_t ini_cap){
 
     temp->data = malloc(temp->cap * sizeof(datatime*));
 
+    temp->res_cap = (size_t)(temp->cap * 1.41);
+    if(temp->res_cap <= temp->cap)
+        temp->res_cap = temp->cap + 1;
+
+    temp->res = malloc(temp->res_cap * sizeof(datatime*));
+
     return temp;
 }
 
@@ -21,6 +27,7 @@ void vec_destroy(vector_t *vec){
         datatime_destroy(*(vec->data + i));
 
     free(vec->data);
+    free(vec->res);
     free(vec);
 }
 
@@ -31,19 +38,25 @@ static void vec_resize(vector_t *vec, size_t new_cap){
 }
 
 static int vec_reserve(vector_t *vec, size_t new_cap){
-    if(vec == NULL) return 0;
-    if(new_cap <= vec->cap) return 1;
-
-    datatime** new_data = malloc(new_cap * sizeof(datatime*));
-    if(new_data == NULL) return 0;
+    if(vec == NULL) return 1;
+    if(new_cap <= vec->cap) return 0;
 
     for(int i = 0; i < vec->len; i++)
-        *(new_data + i) = *(vec->data + i);
+        *(vec->res + i) = *(vec->data + i);
 
     free(vec->data);
-    vec->data = new_data;
+    vec->data = vec->res;
     vec->cap = new_cap;
-    return 1;
+
+    vec->res_cap = (size_t)(vec->cap * 1.41);
+    if(vec->res_cap <= vec->cap)
+        vec->res_cap = vec->cap + 1;
+
+    vec->res = malloc(vec->res_cap * sizeof(datatime*));
+    if(vec->res == NULL) return 1;
+    
+
+    return 0;
 }
 
 int vec_push(vector_t *vec, datatime *dt){
@@ -55,7 +68,7 @@ int vec_push(vector_t *vec, datatime *dt){
         if(new_cap <= vec->cap)
             new_cap = vec->cap + 1;
 
-        if(!vec_reserve(vec, new_cap))
+        if(vec_reserve(vec, new_cap))
             return 1;
     }
         
@@ -122,7 +135,7 @@ int vec_insert(vector_t *vec, size_t ind, datatime *dt){
         if(new_cap <= vec->cap)
             new_cap = vec->cap + 1;
 
-    if(!vec_reserve(vec, new_cap))
+    if(vec_reserve(vec, new_cap))
         return 1;
     }
 
@@ -187,7 +200,7 @@ int vec_merge(vector_t *v1, vector_t *v2){
 
     size_t total_len = v1->len + v2->len;
     if(total_len > v1->cap)
-        if(!vec_reserve(v1, total_len)) return 1;
+        if(vec_reserve(v1, total_len)) return 1;
     
     for(int i = 0; i < v2->len; i++){
         datatime *new_dt = calloc(1, sizeof(datatime));

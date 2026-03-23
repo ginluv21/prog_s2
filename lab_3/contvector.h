@@ -8,8 +8,10 @@
 
 typedef struct{
     datatime** data;
+    datatime** res;
     size_t len;
     size_t cap;
+    size_t res_cap;
 } vector_t;
 
 typedef struct{

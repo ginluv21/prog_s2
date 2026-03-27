@@ -20,8 +20,8 @@ int main() {
     vec_insert(v1, 1, datatime_create(21, 7, 1971, 20, 0));
     print_vector(v1);
 
-    printf("Вставляем 15.05.2023 12:00 на индекс 1:\n");
-    vec_insert(v1, 1, datatime_create(25, 9, 1972, 2, 12));
+    printf("Заменяем 15.05.2023 12:00 на индекс 1:\n");
+    vec_change(v1, 1, datatime_create(25, 9, 1972, 2, 12));
     print_vector(v1);
 
     printf("3. УДАЛЕНИЕ (REMOVE) И ИЗВЛЕЧЕНИЕ (POP)\n");
@@ -62,7 +62,7 @@ int main() {
         vec_iter_next(&beg);
     }
 
-    printf("7. ОЧИСТКА ПАМЯТИ (DESTROY)\n");
+    //printf("7. ОЧИСТКА ПАМЯТИ (DESTROY)\n");
     vec_destroy(v1);
     vec_destroy(v2);
     v1 = NULL;

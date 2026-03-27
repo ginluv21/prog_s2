@@ -3,4 +3,4 @@ gcc:
 clean:
 	rm -f *.o
 run: gcc
-	./1.o
+	leaks --atExit -- ./1.o

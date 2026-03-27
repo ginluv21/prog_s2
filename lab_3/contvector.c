@@ -1,21 +1,30 @@
 #include "contvector.h"
 
-vector_t * vec_create(size_t ini_cap){
+vector_t *vec_create(size_t ini_cap){
     vector_t* temp = malloc(sizeof(vector_t));
+    if(temp == NULL) return NULL;
 
     if(ini_cap == 0)
-        temp->cap = 1;
-    else
-        temp->cap = ini_cap;
+        ini_cap = 1;
+    temp->cap = ini_cap;
     temp->len = 0;
 
     temp->data = malloc(temp->cap * sizeof(datatime*));
+    if(temp->data == NULL){
+        free(temp);
+        return NULL;
+    }
 
-    temp->res_cap = (size_t)(temp->cap * 1.41);
-    if(temp->res_cap <= temp->cap)
-        temp->res_cap = temp->cap + 1;
+    size_t res_cap = (size_t)(temp->cap * 1.41);
+    if(res_cap <= temp->cap)
+        res_cap = temp->cap + 1;
 
-    temp->res = malloc(temp->res_cap * sizeof(datatime*));
+    temp->res = malloc(res_cap * sizeof(datatime*));
+    if(temp->res == NULL){
+        free(temp->data);
+        free(temp);
+        return NULL;
+    }
 
     return temp;
 }
@@ -37,24 +46,26 @@ static void vec_resize(vector_t *vec, size_t new_cap){
     vec->cap = new_cap;
 }
 
-static int vec_reserve(vector_t *vec, size_t new_cap){
+static int vec_reserve(vector_t *vec){
     if(vec == NULL) return 1;
-    if(new_cap <= vec->cap) return 0;
 
-    for(int i = 0; i < vec->len; i++)
+    for(size_t i = 0; i < vec->len; i++)
         *(vec->res + i) = *(vec->data + i);
 
     free(vec->data);
     vec->data = vec->res;
+
+    size_t new_cap = (size_t)(vec->cap * 1.41);
+    if(new_cap <= vec->cap)
+        new_cap = vec->cap + 1;
     vec->cap = new_cap;
 
-    vec->res_cap = (size_t)(vec->cap * 1.41);
-    if(vec->res_cap <= vec->cap)
-        vec->res_cap = vec->cap + 1;
+    size_t res_cap = (size_t)(vec->cap * 1.41);
+    if(res_cap <= vec->cap)
+        res_cap = vec->cap + 1;
 
-    vec->res = malloc(vec->res_cap * sizeof(datatime*));
+    vec->res = malloc(res_cap * sizeof(datatime*));
     if(vec->res == NULL) return 1;
-    
 
     return 0;
 }
@@ -63,13 +74,7 @@ int vec_push(vector_t *vec, datatime *dt){
     if(vec == NULL || dt == NULL) return 1;
 
     if(vec->len == vec->cap){
-        size_t new_cap = (size_t)(vec->cap * 1.41);
-        
-        if(new_cap <= vec->cap)
-            new_cap = vec->cap + 1;
-
-        if(vec_reserve(vec, new_cap))
-            return 1;
+        vec_reserve(vec);
     }
         
     *(vec->data + vec->len) = dt;
@@ -125,18 +130,11 @@ int vec_insert(vector_t *vec, size_t ind, datatime *dt){
     if(vec == NULL || dt == NULL) return 1;
     if(ind > vec->len) return 1;
 
-    if(ind == vec->len){
+    if(ind == vec->len)
         return vec_push(vec, dt);
-        return 0;
-    }
+
     if(vec->len == vec->cap){
-        size_t new_cap = (size_t)(vec->cap * 1.41);
-
-        if(new_cap <= vec->cap)
-            new_cap = vec->cap + 1;
-
-    if(vec_reserve(vec, new_cap))
-        return 1;
+        vec_reserve(vec);
     }
 
     vec_shr(vec, ind);
@@ -185,7 +183,7 @@ vector_t *vec_copy(vector_t *vec){
     if(temp == NULL) return NULL;
 
     for(int i = 0; i < vec->len; i++){
-        datatime *new_dt = calloc(1, sizeof(datatime));
+        datatime *new_dt = malloc(sizeof(datatime));
         if(new_dt == NULL) return NULL;
 
         copy_datatime(new_dt, *(vec->data + i));
@@ -200,10 +198,10 @@ int vec_merge(vector_t *v1, vector_t *v2){
 
     size_t total_len = v1->len + v2->len;
     if(total_len > v1->cap)
-        if(vec_reserve(v1, total_len)) return 1;
+        vec_resize(v1,total_len);
     
     for(int i = 0; i < v2->len; i++){
-        datatime *new_dt = calloc(1, sizeof(datatime));
+        datatime *new_dt = malloc(sizeof(datatime));
 
         if(new_dt == NULL) return 1;
         copy_datatime(new_dt, *(v2->data + i));
@@ -224,7 +222,7 @@ vec_iter_t vec_begin(vector_t *vec){
 vec_iter_t vec_end(vector_t *vec){
     vec_iter_t temp;
     temp.vec = vec;
-    temp.ind = (vec->len) ? vec->len - 1: 0;
+    temp.ind = (vec->len) ? vec->len : 0;
     return temp;
 }
 

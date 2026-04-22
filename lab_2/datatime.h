@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include "bitstruct.h"
 
+extern const int month_lengths[12];
+
 typedef struct {
     int day;
     int month;

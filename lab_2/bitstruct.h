@@ -43,6 +43,7 @@ void dev_set_alarm(device* d, uint16_t value);
 void dev_set_memory(device* d, uint16_t value);
 void dev_set_cpu(device* d, uint16_t value);
 void dev_set_water(device* d, uint16_t value);
+void dev_set_raw_data(device* d, uint16_t raw_data);
 
 uint16_t dev_get_display(device* d); // чтение значения
 uint16_t dev_get_brightness(device* d);
@@ -56,6 +57,8 @@ void dev_destroy(device* d);
 device* dev_create(void);
 
 int get_choice(uint16_t min, uint16_t max);
+
+void dev_print(device* d);
 
 
 extern const int display_price[];

@@ -137,3 +137,34 @@ int get_choice(uint16_t min, uint16_t max) {
         return val;
     }
 }
+
+
+void dev_set_raw_data(device* d, uint16_t raw_data){
+    if(d != NULL){
+        d->data = raw_data;
+    }
+}
+
+void dev_print(device* d) {
+    if (d == NULL) {
+        printf(" [Устройство не установлено]\n");
+        return;
+    }
+
+    uint16_t disp  = dev_get_display(d);
+    uint16_t cpu   = dev_get_cpu(d);
+    uint16_t mem   = dev_get_memory(d);
+    uint16_t water = dev_get_water(d); 
+    uint16_t bri   = dev_get_brightness(d);
+    uint16_t timef = dev_get_time_format(d);
+    uint16_t alarm = dev_get_alarm(d);
+
+    printf("[Часы: %s, CPU: %s, RAM: %s, Вода: %s, Яркость: %u/15, Формат: %s, Будильник: %s]\n",
+           display_names[disp], 
+           cpu_names[cpu], 
+           memory_names[mem], 
+           water_names[water],
+           bri,
+           timef ? "12h" : "24h",
+           alarm ? "Вкл" : "Выкл");
+}

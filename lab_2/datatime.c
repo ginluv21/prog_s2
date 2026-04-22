@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "datatime.h"
 
-static const int month_lengths[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+const int month_lengths[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 static const unsigned long long unix_dt_in_minutes = 1035476640; // datatime_to_minutes(datatime_create(1, 1, 1970, 0, 0));
 
 static int check_time_format(int d, int m, int y, int h, int min) {
@@ -82,6 +82,12 @@ void datatime_print(const datatime *dt) {
         printf("%02d/%02d/%04d %02d:%02d\n",
                 dt->day, dt->month, dt->year,
                 dt->hour, dt->minute);
+    }
+
+    if (dt->dev != NULL) {
+        //dev_print(dt->dev); 
+    } else {
+        printf(" [Девайс отсутствует]\n");
     }
 }
 

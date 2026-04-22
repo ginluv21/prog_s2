@@ -228,7 +228,8 @@ vector_t* load_vec_bin(const char *file){
         return NULL;
     }
 
-    int a = count_elm_bin(file);
+    int count = count_elm_bin(file);
+    if(count <= 0) count = 1;
 
     vector_t *vec = vec_create(a); 
 

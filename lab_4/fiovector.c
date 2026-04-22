@@ -228,7 +228,10 @@ vector_t* load_vec_bin(const char *file){
         return NULL;
     }
 
-    vector_t *vec = vec_create(67); //six seven 
+    int a = count_elm_bin(file);
+
+    vector_t *vec = vec_create(a); 
+
     if(vec == NULL){
         fclose(fp);
         return NULL;

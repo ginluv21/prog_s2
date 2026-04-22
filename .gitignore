@@ -2,6 +2,7 @@
 *.d
 *.bin
 *.txt
+1
 
 # Object files
 *.o

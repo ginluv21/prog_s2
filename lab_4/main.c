@@ -19,9 +19,7 @@ int main(int argc, char *argv[]) {
     char *cmd = argv[1];
     char *mode = argv[2];
 
-    // ==========================================
     // SAVE (с выбором количества)
-    // ==========================================
     if (strcmp(cmd, "save") == 0) {
         char *file = argv[3];
         // Если указали количество - берем его, иначе 10 000
@@ -39,9 +37,7 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    // ==========================================
     // LOAD (умный вывод)
-    // ==========================================
     else if (strcmp(cmd, "load") == 0) {
         char *file = argv[3];
         vector_t *vec = (strcmp(mode, "txt") == 0) ? load_vec_txt(file) : load_vec_bin(file);
@@ -62,9 +58,7 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    // ==========================================
     // LIST
-    // ==========================================
     else if (strcmp(cmd, "list") == 0) {
         char *file = argv[3];
         int count = (strcmp(mode, "txt") == 0) ? count_elm_txt_fast(file) : count_elm_bin(file);
@@ -72,9 +66,7 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    // ==========================================
     // GET
-    // ==========================================
     else if (strcmp(cmd, "get") == 0) {
         if (argc < 5) {
             printf("Для get укажите индекс и файл: %s get bin 5 file.bin\n", argv[0]);
@@ -88,8 +80,7 @@ int main(int argc, char *argv[]) {
         if (dt != NULL) {
             printf("Элемент [%d]: ", index);
             datatime_print(dt);
-            
-            // Если у тебя нет функции datatime_destroy, замени на free(dt->dev); free(dt);
+        
             free(dt->dev);
             free(dt); 
         } else {

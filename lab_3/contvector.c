@@ -40,6 +40,20 @@ void vec_destroy(vector_t *vec){
     free(vec);
 }
 
+static int vec_realloc_res(vector_t *vec){
+    if(vec == NULL) return 1;
+
+    size_t res_cap = (size_t)(vec->cap * 1.41);
+    if(res_cap <= vec->cap)
+        res_cap = vec->cap + 1;
+
+    free(vec->res);
+    vec->res = malloc(res_cap * sizeof(datatime*));
+    if(vec->res == NULL) return 1;
+
+    return 0;
+}
+
 static void vec_resize(vector_t *vec, size_t new_cap){
     if(vec == NULL) return;
     vec->data = realloc(vec->data, new_cap * sizeof(datatime*));
@@ -54,21 +68,18 @@ static int vec_reserve(vector_t *vec){
 
     free(vec->data);
     vec->data = vec->res;
+    vec->res = NULL;
 
     size_t new_cap = (size_t)(vec->cap * 1.41);
     if(new_cap <= vec->cap)
         new_cap = vec->cap + 1;
     vec->cap = new_cap;
 
-    size_t res_cap = (size_t)(vec->cap * 1.41);
-    if(res_cap <= vec->cap)
-        res_cap = vec->cap + 1;
-
-    vec->res = malloc(res_cap * sizeof(datatime*));
-    if(vec->res == NULL) return 1;
+    vec_realloc_res(vec);
 
     return 0;
 }
+
 
 int vec_push(vector_t *vec, datatime *dt){
     if(vec == NULL || dt == NULL) return 1;
@@ -182,9 +193,15 @@ vector_t *vec_copy(vector_t *vec){
     vector_t *temp = vec_create(vec->cap);
     if(temp == NULL) return NULL;
 
-    for(int i = 0; i < vec->len; i++){
+    for(size_t i = 0; i < vec->len; i++){
         datatime *new_dt = malloc(sizeof(datatime));
         if(new_dt == NULL) return NULL;
+
+        new_dt->dev = dev_create();
+        if(new_dt->dev == NULL){
+            free(new_dt);
+            return NULL;
+        }
 
         copy_datatime(new_dt, *(vec->data + i));
         *(temp->data + i) = new_dt;
@@ -197,13 +214,22 @@ int vec_merge(vector_t *v1, vector_t *v2){
     if(v1 == NULL || v2 == NULL) return 1;
 
     size_t total_len = v1->len + v2->len;
-    if(total_len > v1->cap)
-        vec_resize(v1,total_len);
-    
-    for(int i = 0; i < v2->len; i++){
-        datatime *new_dt = malloc(sizeof(datatime));
+    if(total_len > v1->cap){
+        v1->cap = total_len;
+        if(vec_realloc_res(v1)) return 1;
+        if(vec_reserve(v1)) return 1;
+    }
 
+    for(size_t i = 0; i < v2->len; i++){
+        datatime *new_dt = malloc(sizeof(datatime));
         if(new_dt == NULL) return 1;
+
+        new_dt->dev = dev_create();
+        if(new_dt->dev == NULL){
+            free(new_dt);
+            return 1;
+        }
+
         copy_datatime(new_dt, *(v2->data + i));
         vec_push(v1, new_dt);
     }
@@ -248,8 +274,8 @@ void print_vector(vector_t *vec) {
         datatime *dt = vec_get(vec, i);
         if (dt) {
             printf("  [%zu] -> ", i);
-            datatime_print(dt); // Твоя функция
+            datatime_print(dt);
         }
     }
-    printf("\n");
+    putchar('\n');
 }

@@ -19,10 +19,10 @@ int main(int argc, char *argv[]) {
     char *cmd = argv[1];
     char *mode = argv[2];
 
-    // SAVE (с выбором количества)
+    // SAVE
     if (strcmp(cmd, "save") == 0) {
         char *file = argv[3];
-        // Если указали количество - берем его, иначе 10 000
+        // Если не указать 10 000
         int count = (argc >= 5) ? atoi(argv[4]) : 10000; 
         
         vector_t *vec = vec_create(count);

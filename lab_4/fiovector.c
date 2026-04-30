@@ -40,7 +40,7 @@ int save_vec_txt(vector_t * const vec, const char *file){
         return 1;
     }
 
-    for(int i = 0; i < vec->len; i++){
+    for(size_t i = 0; i < vec->len; i++){
         datatime *dt = vec->data[i];
         if(dt == NULL) continue;
 

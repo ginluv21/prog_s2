@@ -25,6 +25,7 @@ void datatime_min_increment(datatime *dt);
 void datatime_hour_increment(datatime *dt);
 void datatime_day_increment(datatime *dt);
 void datatime_month_increment(datatime *dt);
+void datatime_year_increment(datatime *dt);  /* ✅ ДОБАВЛЕНО: было в .c, но не в заголовке */
 void datatime_year_set(datatime *dt, int y);
 void datatime_month_set(datatime *dt, int m);
 void datatime_day_set(datatime *dt, int d);
@@ -43,5 +44,8 @@ datatime* datatime_from_minutes(unsigned long long total_minutes);
 unsigned long long datatime_diff_in_seconds_from_unix(const datatime *dt);
 datatime* create_empty_datatime();
 void copy_datatime(datatime *a, const datatime *b);
+
+/* ✅ ДОБАВЛЕНО: функция была определена в datatime.c, но не объявлена в заголовке */
+void datatimes_switch(datatime *dt1, datatime *dt2);
 
 #endif // DATATIME_H

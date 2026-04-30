@@ -5,7 +5,6 @@ int main(void) {
     printf("Структура: datatime (Дата и время)\n\n");
 
     // 1. Создание и инициализация (3 балла)
-
     datatime *dt1 = datatime_create(1, 2, 2026, 14, 30);
     datatime *dt2 = datatime_create(1, 2, 2026, 14, 32);
 
@@ -15,12 +14,13 @@ int main(void) {
     printf("\n");
 
     // 2. Сравнение дат (3 балла)
-
     int cmp = datatime_compare(dt1, dt2);
     if (cmp < 0) {
-        printf("Первая дата меньше второй на %llu минут\n", datatime_to_minutes(dt2) - datatime_to_minutes(dt1));
+        printf("Первая дата меньше второй на %llu минут\n",
+               datatime_to_minutes(dt2) - datatime_to_minutes(dt1));
     } else if (cmp > 0) {
-        printf("Первая дата больше второй на %llu минут\n", datatime_to_minutes(dt1) - datatime_to_minutes(dt2));
+        printf("Первая дата больше второй на %llu минут\n",
+               datatime_to_minutes(dt1) - datatime_to_minutes(dt2));
     } else {
         printf("Даты равны\n");
     }
@@ -36,7 +36,6 @@ int main(void) {
     datatime_print(empty_dt);
     printf("\n");
     datatime_destroy(&empty_dt);
-      
 
     // 3. Изменение данных (++ / setter)
     printf("Увеличиваем первую дату на 1 минуту:\n");
@@ -57,7 +56,6 @@ int main(void) {
     printf("\n");
 
     // 4. Строковый ввод / вывод (4 балла)
-
     char *str = datatime_to_string(dt1);
     if (str != NULL) {
         printf("Первая дата в строковом виде: %s\n", str);
@@ -76,19 +74,23 @@ int main(void) {
     printf("\n");
 
     // 6. Unix time (5 баллов)
-    unsigned long long unix_time =
-        datatime_diff_in_seconds_from_unix(dt3);
-
+    unsigned long long unix_time = datatime_diff_in_seconds_from_unix(dt3);
     printf("Количество секунд с начала эпохи Unix для третьей даты:\n");
     printf("%llu секунд\n\n", unix_time);
-
 
     // 8. Освобождение памяти
     datatime_destroy(&dt1);
     datatime_destroy(&dt2);
     datatime_destroy(&dt3);
 
-    datatime_destroy(&dt3);
+    /*
+     * ❌ ОШИБКА: datatime_destroy(&dt3) вызывался дважды (строки 88 и 91 оригинала).
+     *    Первый вызов обнуляет dt3 (dt3 = NULL).
+     *    Второй вызов безопасен (free(NULL) — OK), но это явная ошибка в логике кода.
+     *
+     * datatime_destroy(&dt3);  ← удалено
+     */
+
     printf("Память освобождена. Программа завершена.\n");
     return 0;
 }

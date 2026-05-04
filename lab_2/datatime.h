@@ -17,6 +17,8 @@ typedef struct {
     device* dev;
 } datatime;
 
+int is_leap_year(int y);
+
 datatime* datatime_create(int d, int m, int y, int h, int min);
 void datatime_destroy(datatime *dt);
 void datatime_print(const datatime *dt);
@@ -43,5 +45,6 @@ datatime* datatime_from_minutes(unsigned long long total_minutes);
 unsigned long long datatime_diff_in_seconds_from_unix(const datatime *dt);
 datatime* create_empty_datatime();
 void copy_datatime(datatime *a, const datatime *b);
+void datatimes_switch(datatime *dt1, datatime *dt2);
 
 #endif // DATATIME_H

@@ -5,10 +5,21 @@
 const int month_lengths[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 static const unsigned long long unix_dt_in_minutes = 1035476640; // datatime_to_minutes(datatime_create(1, 1, 1970, 0, 0));
 
+int is_leap_year(int y) {
+    return (y % 4 == 0 && y % 100 != 0) || (y % 400 == 0);
+}
+
 static int check_time_format(int d, int m, int y, int h, int min) {
-    if (m < 1 || m > 12 || d < 1 || d > month_lengths[m - 1] || h < 0 || h > 23 || min < 0 || min > 59) {
+    if (m < 1 || m > 12 || h < 0 || h > 23 || min < 0 || min > 59) {
         return 0;
     }
+
+    int max_day = month_lengths[m - 1];
+    if (m == 2 && is_leap_year(y)) max_day = 29;
+    if (d < 1 || d > max_day) {
+        return 0;
+    }
+
     return 1;
 }
 
@@ -53,7 +64,22 @@ void datatime_destroy(datatime *dt) {
 }
 
 datatime* create_empty_datatime() {
-    return datatime_create(0, 0, 0, 0, 0);
+    datatime* dt = malloc(sizeof *dt);
+    if (dt == NULL) return NULL;
+
+    dt->day    = 1;
+    dt->month  = 1;
+    dt->year   = 1;
+    dt->hour   = 0;
+    dt->minute = 0;
+
+    dt->dev = dev_create();
+    if (dt->dev == NULL) {
+        free(dt);
+        return NULL;
+    }
+
+    return dt;
 }
 
 void copy_datatime(datatime *a, const datatime *b){
@@ -85,7 +111,7 @@ void datatime_print(const datatime *dt) {
     }
 
     if (dt->dev != NULL) {
-        //dev_print(dt->dev); 
+        dev_print(dt->dev); 
     } else {
         printf(" [Девайс отсутствует]\n");
     }
@@ -488,8 +514,10 @@ void datatimes_switch(datatime *dt1, datatime *dt2) {
         return;
     }
 
-    datatime temp;
+    datatime temp = {0};
     copy_datatime(&temp, dt1);
     copy_datatime(dt1, dt2);
     copy_datatime(dt2, &temp);
+    
+    if (temp.dev != NULL) dev_destroy(temp.dev);
 }

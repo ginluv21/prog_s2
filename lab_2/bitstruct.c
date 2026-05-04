@@ -69,7 +69,7 @@ void dev_set_cpu(device* d, uint16_t value) {
 
 void dev_set_water(device* d, uint16_t value) {
     if (d == NULL) return;
-    if (value > 3) return;
+    if (value >= 3) return;
 
     d->data = (d->data & ~WAT_MASK) | (value << WAT_SHIFT); 
 }

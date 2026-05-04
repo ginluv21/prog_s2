@@ -19,10 +19,10 @@ int main(int argc, char *argv[]) {
     char *cmd = argv[1];
     char *mode = argv[2];
 
-    // SAVE
+    // SAVE (с выбором количества)
     if (strcmp(cmd, "save") == 0) {
         char *file = argv[3];
-        // Если не указать 10 000
+        // Если указали количество 10 000
         int count = (argc >= 5) ? atoi(argv[4]) : 10000; 
         
         vector_t *vec = vec_create(count);
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    // LOAD (умный вывод)
+    // LOAD
     else if (strcmp(cmd, "load") == 0) {
         char *file = argv[3];
         vector_t *vec = (strcmp(mode, "txt") == 0) ? load_vec_txt(file) : load_vec_bin(file);
@@ -49,7 +49,9 @@ int main(int argc, char *argv[]) {
 
         printf("Загружено %zu элементов.\n", vec->len);
 
-    
+        /* [ЗАМЕЧАНИЕ] при загрузке файла с большим числом элементов (например 10 000)
+           весь вывод зальёт терминал. Можно добавить ограничение через аргумент --limit.
+           Сейчас выводим все элементы как в оригинале. */
         for (size_t i = 0; i < vec->len; i++) {
             printf("[%zu] ", i);
             datatime_print(vec->data[i]);
@@ -80,7 +82,7 @@ int main(int argc, char *argv[]) {
         if (dt != NULL) {
             printf("Элемент [%d]: ", index);
             datatime_print(dt);
-        
+            
             free(dt->dev);
             free(dt); 
         } else {

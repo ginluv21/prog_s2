@@ -86,7 +86,6 @@ datatime* get_elm_txt_slow(const char *file, int indx){
     return res;
 }
 
-
 datatime* get_elm_txt_fast(const char *file, int indx){
     if(file == NULL || indx < 0) return NULL;
 
@@ -181,6 +180,11 @@ int count_elm_txt_fast(const char *file) {
     fseek(fp, 0, SEEK_END);
     
     long file_size = ftell(fp);
+
+    if (file_size < 0) {
+        fclose(fp);
+        return 0;
+    }
     
     fclose(fp);
 
@@ -228,10 +232,9 @@ vector_t* load_vec_bin(const char *file){
         return NULL;
     }
 
-    int count = count_elm_bin(file);
-    if(count <= 0) count = 1;
-
-    vector_t *vec = vec_create(count); 
+    // vector_t *vec = vec_create(67); //six seven 
+    int initial_cap = count_elm_bin(file);
+    vector_t *vec = vec_create(initial_cap > 0 ? initial_cap : 1);
 
     if(vec == NULL){
         fclose(fp);
@@ -297,6 +300,8 @@ int count_elm_bin(const char *file){
 
     fclose(fp);
 
-    return (int)file_size / sizeof(data_ft);
-}
+    if (file_size < 0) return 0;
 
+    // return (int)file_size / sizeof(data_ft);
+    return (int)(file_size / (long)sizeof(data_ft));
+}

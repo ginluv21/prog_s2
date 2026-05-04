@@ -88,7 +88,7 @@ int main(void) {
     datatime_destroy(&dt2);
     datatime_destroy(&dt3);
 
-    datatime_destroy(&dt3);
+    // datatime_destroy(&dt3);
     printf("Память освобождена. Программа завершена.\n");
     return 0;
 }

@@ -49,9 +49,6 @@ int main(int argc, char *argv[]) {
 
         printf("Загружено %zu элементов.\n", vec->len);
 
-        /* [ЗАМЕЧАНИЕ] при загрузке файла с большим числом элементов (например 10 000)
-           весь вывод зальёт терминал. Можно добавить ограничение через аргумент --limit.
-           Сейчас выводим все элементы как в оригинале. */
         for (size_t i = 0; i < vec->len; i++) {
             printf("[%zu] ", i);
             datatime_print(vec->data[i]);
@@ -83,8 +80,9 @@ int main(int argc, char *argv[]) {
             printf("Элемент [%d]: ", index);
             datatime_print(dt);
             
-            free(dt->dev);
-            free(dt); 
+            // free(dt->dev);
+            // free(dt);
+            datatime_destroy(dt);
         } else {
             printf("Элемент с индексом %d не найден!\n", index);
         }

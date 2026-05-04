@@ -3,7 +3,7 @@
 #include "datatime.h"
 
 const int month_lengths[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-static const unsigned long long unix_dt_in_minutes = 1035476640; // datatime_to_minutes(datatime_create(1, 1, 1970, 0, 0));
+static const unsigned long long unix_dt_in_minutes = 1035432000; // 1970 * 365 * 24 * 60
 
 int is_leap_year(int y) {
     return (y % 4 == 0 && y % 100 != 0) || (y % 400 == 0);
@@ -108,12 +108,12 @@ void datatime_print(const datatime *dt) {
         printf("%02d/%02d/%04d %02d:%02d\n",
                 dt->day, dt->month, dt->year,
                 dt->hour, dt->minute);
-    }
 
-    if (dt->dev != NULL) {
-        dev_print(dt->dev); 
-    } else {
-        printf(" [Девайс отсутствует]\n");
+        if (dt->dev != NULL) {
+            //dev_print(dt->dev);
+        } else {
+            printf(" [Девайс отсутствует]\n");
+        }
     }
 }
 
@@ -385,9 +385,11 @@ unsigned long long datatime_to_minutes(const datatime *dt) {
 
     unsigned long long total = 0;
 
-    total += dt->year * 365 * 24 * 60;
+    // total += dt->year * 365 * 24 * 60;
+    total += (unsigned long long)dt->year * 365 * 24 * 60;
 
-    for (int m = 0; m < dt->month; m++) {
+    // for (int m = 0; m < dt->month; m++) {
+    for (int m = 0; m < dt->month - 1; m++) {
         total += month_lengths[m] * 24 * 60;
     }
 
@@ -409,6 +411,7 @@ datatime* datatime_from_minutes(unsigned long long total_minutes) {
     dt->day = 1;
     dt->hour = 0;
     dt->minute = 0;
+    dt->dev = NULL;
 
     unsigned long long minutes_in_year = 365 * 24 * 60;
 

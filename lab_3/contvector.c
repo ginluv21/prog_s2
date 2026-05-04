@@ -42,7 +42,10 @@ void vec_destroy(vector_t *vec){
 
 static void vec_resize(vector_t *vec, size_t new_cap){
     if(vec == NULL) return;
-    vec->data = realloc(vec->data, new_cap * sizeof(datatime*));
+    // vec->data = realloc(vec->data, new_cap * sizeof(datatime*));
+    datatime **temp = realloc(vec->data, new_cap * sizeof(datatime*));
+    if(temp == NULL) return;
+    vec->data = temp;
     vec->cap = new_cap;
 }
 
@@ -187,7 +190,11 @@ vector_t *vec_copy(vector_t *vec){
     for(int i = 0; i < vec->len; i++){
         // datatime *new_dt = malloc(sizeof(datatime));
         datatime *new_dt = calloc(1, sizeof(datatime));
-        if(new_dt == NULL) return NULL;
+        // if(new_dt == NULL) return NULL;
+        if(new_dt == NULL){
+            vec_destroy(temp);
+            return NULL;
+        }
 
         copy_datatime(new_dt, *(vec->data + i));
         *(temp->data + i) = new_dt;
@@ -204,12 +211,12 @@ int vec_merge(vector_t *v1, vector_t *v2){
         vec_resize(v1,total_len);
     
     for(int i = 0; i < v2->len; i++){
-        // datatime *new_dt = malloc(sizeof(datatime)); 
+        // datatime *new_dt = malloc(sizeof(datatime));
         datatime *new_dt = calloc(1, sizeof(datatime));
 
         if(new_dt == NULL) return 1;
-        //copy_datatime(new_dt, *(v2->data + i));
-        memcpy(new_dt, *(v2->data + i), sizeof(datatime));
+        // memcpy(new_dt, *(v2->data + i), sizeof(datatime));
+        copy_datatime(new_dt, *(v2->data + i));
         vec_push(v1, new_dt);
     }
 

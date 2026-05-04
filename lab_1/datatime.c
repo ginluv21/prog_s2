@@ -3,7 +3,7 @@
 #include "datatime.h"
 
 static const int month_lengths[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-static const unsigned long long unix_dt_in_minutes = 1035476640; // datatime_to_minutes(datatime_create(1, 1, 1970, 0, 0));
+static const unsigned long long unix_dt_in_minutes = 1035432000; // 1970 * 365 * 24 * 60
 
 static int check_time_format(int d, int m, int y, int h, int min) {
     if (m < 1 || m > 12 || d < 1 || d > month_lengths[m - 1] || h < 0 || h > 23 || min < 0 || min > 59) {
@@ -40,7 +40,8 @@ void datatime_destroy(datatime **dt) {
 }
 
 datatime* create_empty_datatime() {
-    return datatime_create(0, 0, 0, 0, 0);
+    // return datatime_create(0, 0, 0, 0, 0);
+    return datatime_create(1, 1, 1, 0, 0);
 }
 
 void copy_datatime(datatime *a, const datatime *b) {
@@ -328,10 +329,11 @@ unsigned long long datatime_to_minutes(const datatime *dt) {
     }
 
     unsigned long long total = 0;
+    // total += dt->year * 365 * 24 * 60;
+    total += (unsigned long long)dt->year * 365 * 24 * 60;
 
-    total += dt->year * 365 * 24 * 60;
-
-    for (int m = 0; m < dt->month; m++) {
+    // for (int m = 0; m < dt->month; m++) {
+    for (int m = 0; m < dt->month - 1; m++) {
         total += month_lengths[m] * 24 * 60;
     }
 

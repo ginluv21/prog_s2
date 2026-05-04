@@ -207,7 +207,7 @@ int save_vec_bin(vector_t *vec, const char *file){
             return 1;
         }
 
-        data_ft rec;
+        data_ft rec = {0};
         rec.day = dt->day;
         rec.month = dt->month;
         rec.year = dt->year;

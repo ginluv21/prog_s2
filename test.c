@@ -5,7 +5,7 @@
 #include "lab_3/contvector.h"
 #include "lab_4/fiovector.h"
 
-#define N 10000
+#define N 10
 #define TXT_FILE "test_data.txt"
 #define BIN_FILE "test_data.bin"
 
@@ -50,9 +50,8 @@ int main(void) {
     datatime *popped = vec_pop(vec);
     printf("pop: "); datatime_print(popped);
     printf("после pop: len=%zu\n", vec_len(vec));
-    // [LEAK 1] vec_pop отдаёт владение вызывателю — без destroy объект утекает
-    // раскомментировать чтобы исправить:
-    // datatime_destroy(popped);
+    // [LEAK 1] vec_pop
+    datatime_destroy(popped);
 
     vec_insert(vec, 0, datatime_create(31, 12, 1999, 23, 59));
     printf("insert [0]: len=%zu, [0]=", vec_len(vec));
@@ -66,10 +65,9 @@ int main(void) {
     printf("оригинал len=%zu, копия len=%zu\n", vec_len(vec), vec_len(copy));
     vec_destroy(copy);
     vec_destroy(vec);
-    // [LEAK 2] dt1 и dt2 созданы в тесте 1 — без destroy утекают
-    // раскомментировать чтобы исправить:
-    // datatime_destroy(dt1);
-    // datatime_destroy(dt2);
+    // [LEAK 2] dt1 и dt2
+    datatime_destroy(dt1);
+    datatime_destroy(dt2);
     printf("ок\n\n");
 
     printf("тест 6: vec_merge\n");
@@ -109,8 +107,7 @@ int main(void) {
     vec_destroy(big);
     printf("ок\n\n");
 
-    // count_elm_txt читает файл построчно — O(n)
-    // count_elm_txt_fast и count_elm_bin считают через размер файла — O(1)
+
     printf("тест 10: count — slow vs fast\n");
     int cnt;
 
@@ -124,8 +121,7 @@ int main(void) {
     printf("count_elm_bin  (fast O(1)): %d эл, %.3f мс\n", cnt, wtime() - t);
     printf("ок\n\n");
 
-    // get_elm_txt_slow сканирует с начала файла — O(n)
-    // get_elm_txt_fast и get_elm_bin прыгают fseek на нужную позицию — O(1)
+
     printf("тест 11: get [%d] — slow vs fast\n", N / 2);
     datatime *el;
 
@@ -157,20 +153,33 @@ int main(void) {
     printf("---\n");
     printf("все тесты пройдены\n\n");
 
-    // -----------------------------------------------
-    // заготовки для демонстрации проблем
-    // раскомментировать нужный блок перед запуском
-    // -----------------------------------------------
+    // тест оптимизаций: datatime_to_minutes с циклом
 
-    // [DOUBLE FREE] программа упадёт — краш хорошо видно в GDB
-    // datatime *df = datatime_create(1, 1, 2001, 0, 0);
-    // datatime_destroy(df);
-    // datatime_destroy(df);
+    printf("тест оптимизаций: datatime_to_minutes\n");
+    datatime *dates[4];
+    dates[0] = datatime_create(1,  1, 1970,  0,  0);
+    dates[1] = datatime_create(15, 3, 2025, 10, 30);
+    dates[2] = datatime_create(31,12, 1999, 23, 59);
+    dates[3] = datatime_create(1,  7, 2000,  0,  0);
 
-    // [USE AFTER FREE] UB — хорошо видно в Valgrind
-    // datatime *uaf = datatime_create(5, 5, 2005, 5, 5);
-    // datatime_destroy(uaf);
-    // datatime_print(uaf);
+    for (int i = 0; i < 4; i++) {
+        unsigned long long mins = datatime_to_minutes(dates[i]);
+        printf("  [%d] ", i);
+        datatime_print(dates[i]);
+        printf("      -> %llu минут\n", mins);
+        datatime_destroy(dates[i]);
+    }
+    printf("ок\n\n");
+
+    // [DOUBLE FREE] программа упадёт 
+    //datatime *df = datatime_create(1, 1, 2001, 0, 0);
+    //datatime_destroy(df);
+    //datatime_destroy(df);
+
+    // [USE AFTER FREE] UB 
+    //datatime *uaf = datatime_create(5, 5, 2005, 5, 5);
+    //datatime_destroy(uaf);
+    //datatime_print(uaf);
 
     return 0;
 }
